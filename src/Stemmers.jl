@@ -2,7 +2,8 @@ module Stemmers
 
 export stemmer_types, Stemmer, stem
 
-const _libsb = "libstemmer"
+const _libsb = joinpath(Pkg.dir(),"Stemmers","deps","usr","lib","libstemmer.so")
+#const _libsb = "libstemmer"
 
 ##
 # character encodings supported by libstemmer
