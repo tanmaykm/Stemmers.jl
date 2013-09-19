@@ -1,6 +1,11 @@
 module Stemmers
 
-export stemmer_types, Stemmer, stem
+using TextAnalysis
+using Languages
+
+import Base.show
+import TextAnalysis.stem!
+export stemmer_types, Stemmer, stem, show, stem!
 
 const _libsb = joinpath(Pkg.dir(),"Stemmers","deps","usr","lib","libstemmer.so")
 #const _libsb = "libstemmer"
@@ -43,6 +48,8 @@ type Stemmer
     end
 end
 
+show(io::IO, stm::Stemmer) = println(io, "Stemmer algorithm:$(stm.alg) encoding:$(stm.enc)")
+
 function release(stm::Stemmer)
     (C_NULL == stm.cptr) && return
     ccall((:sb_stemmer_delete, _libsb), Void, (Ptr{Void},), stm.cptr)
@@ -59,13 +66,65 @@ function stem(stemmer::Stemmer, word::String)
     bytestring(bytes)
 end
 
-function stem(stemmer::Stemmer, words::Array{String})
+function stem(stemmer::Stemmer, words::Array)
     l = length(words)
     ret = Array(String, l)
     for idx in 1:l
         ret[idx] = stem(stemmer, words[idx])
     end
     ret
+end
+
+function stemmer_for_document(d::AbstractDocument)
+    langtype = language(d)
+    alg = "porter"
+    if langtype == EnglishLanguage 
+        alg = "english"
+    end
+    Stemmer(alg)
+end
+
+function stem!(d::AbstractDocument)
+    stemmer = stemmer_for_document(d)
+    stem!(stemmer, d)
+    release(stemmer)
+end
+
+function stem!(stemmer::Stemmer, d::FileDocument)
+    error("FileDocument cannot be modified")
+end
+
+function stem!(stemmer::Stemmer, d::StringDocument)
+    tokens = TextAnalysis.tokenize(language(d), d.text)
+    stemmed = convert(Array{UTF8String, 1}, stem(stemmer, tokens))
+    d.text = join(stemmed, ' ')
+    nothing 
+end
+
+function stem!(stemmer::Stemmer, d::TokenDocument)
+    d.tokens = convert(Array{UTF8String, 1}, stem(stemmer, d.tokens))
+end 
+    
+function stem!(stemmer::Stemmer, d::NGramDocument)
+    for token in keys(d.ngrams)
+        new_token = stem(stemmer, token)
+        if new_token != token
+            if haskey(d.ngrams, new_token)
+                d.ngrams[new_token] = d.ngrams[new_token] + d.ngrams[token]
+            else
+                d.ngrams[new_token] = d.ngrams[token]
+            end
+            delete!(d.ngrams, token)
+        end
+    end
+end
+
+function stem!(crps::Corpus)
+    stemmer = stemmer_for_document(crps.documents[1])
+    for doc in crps
+        stem!(stemmer, doc)
+    end
+    release(stemmer)
 end
 
 end
