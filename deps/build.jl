@@ -14,7 +14,7 @@ bindir = joinpath(prefix,"lib")
 
 dnldfile = joinpath(dnlddir, "snowball_code.tgz")
 patchpath = joinpath(BinDeps.depsdir(libstemmer),"patches","libstemmer-so.patch")
-binpath = joinpath(bindir, "libstemmer.so")
+binpath = joinpath(bindir, @osx ? "libstemmer.dylib" : @unix ? "libstemmer.so" : "libstemmer.dll")
 
 for path in [prefix, dnlddir, srchome, bindir]
     #println("making path $path")
@@ -39,3 +39,6 @@ end
     end
 end
 
+@windows_only begin
+    Base.warn("Windows build is not yet integrated. Place compiled snowball stemmer dll at $binpath for package to work.")
+end

@@ -7,7 +7,7 @@ import Base.show
 import TextAnalysis.stem!
 export stemmer_types, Stemmer, stem, show, stem!
 
-const _libsb = joinpath(Pkg.dir(),"Stemmers","deps","usr","lib","libstemmer.so")
+const _libsb = joinpath(Pkg.dir(),"Stemmers","deps","usr","lib", @osx ? "libstemmer.dylib" : @unix ? "libstemmer.so" : "libstemmer.dll")
 #const _libsb = "libstemmer"
 
 ##
