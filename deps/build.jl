@@ -2,11 +2,10 @@ using BinDeps
 
 @BinDeps.setup
 
-deps = [
-    libstemmer = library_dependency("libstemmer", aliases=["libstemmer", "libstemmer.so", "libstemmer.dylib", "libstemmer.dll"])
-]
+libstemmer = library_dependency("libstemmer", aliases=["libstemmer"])
 
-prefix=joinpath(BinDeps.depsdir(libstemmer),"usr")
+
+prefix = joinpath(BinDeps.depsdir(libstemmer),"usr")
 dnlddir = joinpath(BinDeps.depsdir(libstemmer), "downloads")
 srchome = joinpath(BinDeps.depsdir(libstemmer),"src")
 srcdir = joinpath(srchome,"snowball_code")
@@ -14,7 +13,7 @@ bindir = joinpath(prefix,"lib")
 
 dnldfile = joinpath(dnlddir, "snowball_code.tgz")
 patchpath = joinpath(BinDeps.depsdir(libstemmer),"patches","libstemmer-so.patch")
-binpath = joinpath(bindir, @osx ? "libstemmer.dylib" : @unix ? "libstemmer.so" : "libstemmer.dll")
+binpath = joinpath(bindir, "libstemmer."*BinDeps.shlib_ext)
 
 for path in [prefix, dnlddir, srchome, bindir]
     #println("making path $path")

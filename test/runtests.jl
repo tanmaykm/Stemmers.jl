@@ -5,7 +5,7 @@ algs = stemmer_types()
 
 for alg in algs
     stmr = Stemmer(alg)
-    Stemmer.release(stmr)
+    Stemmers.release(stmr)
 end
 
 test_cases = {

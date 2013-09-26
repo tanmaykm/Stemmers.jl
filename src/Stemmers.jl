@@ -2,12 +2,13 @@ module Stemmers
 
 using TextAnalysis
 using Languages
+using BinDeps
 
 import Base.show
-import TextAnalysis.stem!
+import TextAnalysis.stem!, TextAnalysis.stem
 export stemmer_types, Stemmer, stem, show, stem!
 
-const _libsb = joinpath(Pkg.dir(),"Stemmers","deps","usr","lib", @osx ? "libstemmer.dylib" : @unix ? "libstemmer.so" : "libstemmer.dll")
+const _libsb = joinpath(Pkg.dir(),"Stemmers","deps","usr","lib", "libstemmer."*BinDeps.shlib_ext)
 #const _libsb = "libstemmer"
 
 ##
