@@ -8,8 +8,7 @@ import Base.show
 import TextAnalysis.stem!, TextAnalysis.stem
 export stemmer_types, Stemmer, stem, show, stem!
 
-const _libsb = joinpath(Pkg.dir(),"Stemmers","deps","usr","lib", "libstemmer."*BinDeps.shlib_ext)
-#const _libsb = "libstemmer"
+@BinDeps.load_dependencies [:libstemmer=>:_libsb]
 
 ##
 # character encodings supported by libstemmer
